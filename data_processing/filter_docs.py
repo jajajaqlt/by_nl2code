@@ -5,6 +5,8 @@ import sys
 input_file = sys.argv[1]
 output_file = sys.argv[2]
 
+sys.setrecursionlimit(10000)
+
 with open(input_file) as f:
     progs = json.load(f)['programs']
 
