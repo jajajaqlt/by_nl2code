@@ -20,6 +20,9 @@ for prog in progs:
 
         javadoc = prog['javadoc']
 
+        if javadoc == None or javadoc == '':
+            continue
+
         # removes <code>...</code> pairs and content in between
         code_patt = r'<code>.*?<\/code>'
         javadoc = re.sub(code_patt, '', javadoc)
