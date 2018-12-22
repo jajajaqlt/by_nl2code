@@ -36,6 +36,10 @@ for prog in progs:
     # gets the first sentence
     javadoc = javadoc.split('.')[0]
 
+    # filters out those containing "TODO", "FIXME", "NOTE"
+    if "TODO" in javadoc or "FIXME" in javadoc or "NOTE" in javadoc:
+        continue
+
     # lowercases all
     javadoc = javadoc.lower()
 
@@ -55,10 +59,6 @@ for prog in progs:
 
     # filters out those starting with test
     if javadoc.startswith('test'):
-        continue
-
-    # filters out those containing "TODO", "FIXME", "NOTE"
-    if "TODO" in javadoc or "FIXME" in javadoc or "NOTE" in javadoc:
         continue
 
     # removes those with one word only (good for empty docs also)
