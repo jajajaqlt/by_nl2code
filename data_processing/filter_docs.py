@@ -99,7 +99,7 @@ for prog in progs:
         continue
 
     # do lemmatization on javadoc tokens
-    javadoc = ' '.join([wordnet_lemmatizer.lemmatize(word) for word in javadoc.split()])
+    javadoc = ' '.join([wordnet_lemmatizer.lemmatize(word) for word in javadoc.split() if word != 'as'])
 
     prog['javadoc'] = javadoc
     out_progs.append(prog)
