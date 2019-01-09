@@ -4,8 +4,13 @@ import sys
 
 from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
+from re import finditer
 
 wordnet_lemmatizer = WordNetLemmatizer()
+
+def camel_case_split(identifier):
+    matches = finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', identifier)
+    return [m.group(0) for m in matches]
 
 input_file = sys.argv[1]
 output_file = sys.argv[2]
@@ -40,26 +45,19 @@ for prog in progs:
     if "TODO" in javadoc or "FIXME" in javadoc or "NOTE" in javadoc:
         continue
 
-    # lowercases all
-    javadoc = javadoc.lower()
-
     # removes all kinds of pairs of parentheses and their content
     paren_patt = r'\(.*?\)|\[.*?\]|\<.*?\>|\{.*?\}'
     javadoc = re.sub(paren_patt, '', javadoc)
 
     # replaces numbers with '#'
     num_patt = r'[-+]?[\d,]*\.?\d+([eE][-+]?\d+)?'
-    javadoc = re.sub(num_patt, '#', javadoc)
+    javadoc = re.sub(num_patt, ' # ', javadoc)
 
     # strips trailing zeros
     javadoc = javadoc.strip()
 
     # combine consecutive spaces
     javadoc = re.sub(' +', ' ', javadoc)
-
-    # filters out those starting with test
-    if javadoc.startswith('test'):
-        continue
 
     # removes those with one word only (good for empty docs also)
     if ' ' not in javadoc:
@@ -85,7 +83,20 @@ for prog in progs:
         continue
 
     # removes punctuation except '#'
-    javadoc = re.sub(r'[^\w\s#]', '', javadoc)
+    javadoc = re.sub(r'[^\w\s#]', ' ', javadoc)
+
+    # split camel case (naive regex approach)
+    camels = []
+    for split in javadoc.split():
+        camels.extend(camel_case_split(split))
+    javadoc = ' '.join(camels)
+
+    # lowercases all
+    javadoc = javadoc.lower()
+
+    # filters out those starting with test
+    if javadoc.startswith('test'):
+        continue
 
     # do lemmatization on javadoc tokens
     javadoc = ' '.join([wordnet_lemmatizer.lemmatize(word) for word in javadoc.split()])
