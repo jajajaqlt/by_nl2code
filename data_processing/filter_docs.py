@@ -6,6 +6,8 @@ from nltk.corpus import wordnet
 from nltk.stem import WordNetLemmatizer
 from re import finditer
 
+import ijson.backends.yajl2_cffi as ijson
+
 wordnet_lemmatizer = WordNetLemmatizer()
 
 def camel_case_split(identifier):
@@ -17,14 +19,16 @@ output_file = sys.argv[2]
 
 sys.setrecursionlimit(10000)
 
-with open(input_file) as f:
-    progs = json.load(f)['programs']
+# with open(input_file) as f:
+#     progs = json.load(f)['programs']
+
+f = open(input_file, 'rb')
 
 out_progs = []
 count = 0
 verb_count = 0
 non_verb_count = 0
-for prog in progs:
+for prog in ijson.items(f, 'programs.item'):
     count += 1
     if count % 1000 == 0:
         print(count)
@@ -108,8 +112,9 @@ for prog in progs:
     prog['javadoc'] = javadoc
     out_progs.append(prog)
 
-print('There are totally %i programs, among which %i are generally good. %i start with verbs and are reserved' % (len(
-    progs), verb_count + non_verb_count, verb_count))
+print('There are totally %i programs, among which %i are generally good. %i start with verbs and are reserved' % (count, verb_count + non_verb_count, verb_count))
+
+f.close()
 
 with open(output_file, 'w') as f:
     json.dump({'programs': out_progs}, f, indent=2)
