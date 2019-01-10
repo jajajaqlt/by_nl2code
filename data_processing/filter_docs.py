@@ -29,6 +29,10 @@ for prog in progs:
     if count % 1000 == 0:
         print(count)
 
+    method = prog['method']
+    if method.count('@') != 1:
+        continue
+
     javadoc = prog['javadoc']
 
     if javadoc == None or javadoc == '':
